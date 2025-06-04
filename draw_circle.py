@@ -44,11 +44,11 @@ for dxl_id in XM_IDS:
     pk_xm.write4ByteTxRx(ph_xm, dxl_id, ADDR_XM_SPEED, XM_SPEED)
 
 # === 로봇 팔 정의 ===
-x_offset = 0.007
+x_offset = 0.01
 d1 = 0.0961
 L2 = 0.12 
 L3 = 0.12
-L4 = 0.12
+L4 = 0.127
 HOR = 0.053
 VER = 0.052
 
@@ -112,11 +112,30 @@ def generate_circle_path(center, radius, num_points=100):
 # === 경로 따라가기 + 실제 말단 좌표 수집 ===
 def follow_path(points, delay):
     actual_points = []
-    for i, pt in enumerate(points):
+
+    if len(points) == 0:
+        return actual_points
+
+    # 첫 점으로 이동
+    first_angles = ik_dh_v2(points[0][0],points[0][1], points[0][2])
+    for j, ang in enumerate(first_angles):
+        dxl_id = [0, 1, 2, 3][j]
+        if dxl_id in AX_IDS:
+            val = rad_to_ax(ang)
+            pk_ax.write2ByteTxRx(ph_ax, dxl_id, ADDR_AX_GOAL_POS, val)
+        else:
+            val = rad_to_xm(ang)
+            pk_xm.write4ByteTxRx(ph_xm, dxl_id, ADDR_XM_GOAL_POS, val)
+
+    time.sleep(1.5)  # 고정된 위치에서 1초 대기
+    ee_pos = compute_fk(first_angles)
+    actual_points.append(tuple(ee_pos))
+    print(f"000: Target = {points[0]}, EE = {tuple(np.round(ee_pos, 4))}")
+
+    # 나머지 점 순회
+    for i, pt in enumerate(points[1:], start=1):
         try:
             angles = ik_dh_v2(*pt)
-
-            # 모터로 명령 전송
             for j, ang in enumerate(angles):
                 dxl_id = [0, 1, 2, 3][j]
                 if dxl_id in AX_IDS:
@@ -126,17 +145,14 @@ def follow_path(points, delay):
                     val = rad_to_xm(ang)
                     pk_xm.write4ByteTxRx(ph_xm, dxl_id, ADDR_XM_GOAL_POS, val)
 
-            # FK로 실제 말단 좌표 계산
             ee_pos = compute_fk(angles)
             actual_points.append(tuple(ee_pos))
-
-            # 콘솔 출력
             print(f"{i:03}: Target = {pt}, EE = {tuple(np.round(ee_pos, 4))}")
-
             time.sleep(delay)
         except Exception as e:
             print(f"IK 실패 또는 모터 에러: {e}")
     return actual_points
+
 
 # === 시각화 ===
 def visualize_trajectory(points, show_labels=False):
@@ -160,10 +176,11 @@ def visualize_trajectory(points, show_labels=False):
 
 # === 메인 ===
 if __name__ == "__main__":
-    center_point = (x_offset+0.15, 0.025, d1+0.043)  # 중심점
+    center_point = (x_offset+0.12, 0.0, L4)  # 중심점
     radius = 0.03
     path = generate_circle_path(center_point, radius)
-    followed = follow_path(path, delay=0.5)
+    followed = follow_path(path, delay=0.2)
     visualize_trajectory(followed, show_labels=True)
 
+#### 종이에 닿기 전까지는 원 안그리는거 추가하기, x15 반지름 0.7이면 뻑남 이유 찾아야됨, 2번쩨 팔 설계 다시 ㄱ 혼 뺄수 있게 다시 ㄱ
 
