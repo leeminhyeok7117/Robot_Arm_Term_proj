@@ -47,7 +47,7 @@ for dxl_id in XM_IDS:
 d1 = 0.0961
 L2 = 0.12 
 L3 = 0.12
-L4 = 0.082
+L4 = 0.087
 
 x_offset = 0.006
 y_offset = 0.005
@@ -177,8 +177,8 @@ def visualize_trajectory(points, show_labels=False):
 
 # === 메인 ===
 if __name__ == "__main__":
-    center_point = (x_offset+0.16, y_offset+0.0, L4)  # 중심점
-    radius = 0.06
+    center_point = (x_offset+0.15, y_offset+0.03, L4)  # 중심점
+    radius = 0.03
     path = generate_circle_path(center_point, radius)
     followed = follow_path(path, delay=0.05)
     visualize_trajectory(followed, show_labels=True)

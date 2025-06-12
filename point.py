@@ -62,7 +62,7 @@ for dxl_id in XM_IDS:
 d1 = 0.0961
 L2 = 0.12
 L3 = 0.12
-L4 = 0.09
+L4 = 0.086
 
 x_offset = 0.006
 y_offset = 0.005
@@ -128,7 +128,7 @@ def rad_to_xm(val):
 
 # === 메인 ===
 if __name__=="__main__":
-    goal_pos = [x_offset + 0.14, y_offset + 0.0, L4]
+    goal_pos = [x_offset + 0.15, y_offset + 0.0, L4]
 
     angles = ik_dh_v2(*goal_pos)
     print("IK 결과 (rad):", angles)

@@ -47,7 +47,7 @@ for dxl_id in XM_IDS:
 d1 = 0.0961
 L2 = 0.12 
 L3 = 0.12
-L4 = 0.082
+L4 = 0.086
 
 x_offset = 0.006
 y_offset = 0.005
@@ -63,7 +63,7 @@ def ik_dh_v2(x, y, z, init_angle=None):
     target_position = np.array([x, y, z])
     
     if init_angle is None:
-        init = [0, 0, 0]
+        init = [0, 0, -np.radians(45)]
     else:
         init = init_angle
         
@@ -138,7 +138,7 @@ def follow_path(points, delay):
     actual_points.append(tuple(ee_pos))
     print(f"000: Target = {points[0]}, EE = {tuple(np.round(ee_pos, 4))}")
 
-    prev_angle = [0.0, 0.0, 0.0]  # 초기 각도 설정
+    prev_angle = [0.0, 0.0, -np.radians(45)]  # 초기 각도 설정
     
     # 나머지 점 순회
     for i, pt in enumerate(points[1:], start=1):
@@ -183,12 +183,10 @@ def visualize_trajectory(points, show_labels=False):
     ax.legend()
     plt.show()
 
-# === 메인 === 9~22까지 그리기
+# === 메인 === (x값 0.13에서 가장잘됨 여기로 최대한 맞추기)
 if __name__ == "__main__":
-    center_point = (x_offset+0.16, y_offset+0.0, L4)  # 중심점
-    radius = 0.06
+    center_point = (x_offset+0.16, y_offset-0.04, L4)  # 중심점
+    radius = 0.05
     path = generate_circle_path(center_point, radius)
     followed = follow_path(path, delay=0.05)
     visualize_trajectory(followed, show_labels=True)
-
-
