@@ -62,7 +62,10 @@ for dxl_id in XM_IDS:
 d1 = 0.0961
 L2 = 0.12
 L3 = 0.12
-L4 = 0.12
+L4 = 0.09
+
+x_offset = 0.006
+y_offset = 0.005
 
 robot_chain = Chain(name="4dof_arm", links=[
     OriginLink(),
@@ -95,7 +98,7 @@ def ik_dh_v2(x, y, z):
     joint_angles = [joint1, joint2, joint3, corrected_theta4]
 
     one=dh_transform(joint_angles[0], d1, 0, np.pi/2)
-    two=dh_transform(joint_angles[1]+np.pi/2, 0, L2, 0)
+    two=dh_transform(joint_angles[1], 0, L2, 0)
     thr=dh_transform(joint_angles[2], 0, L3, 0)
     four=dh_transform(joint_angles[3], 0, L4, 0)
     ot = np.dot(one,two)
@@ -125,7 +128,7 @@ def rad_to_xm(val):
 
 # === 메인 ===
 if __name__=="__main__":
-    goal_pos = [0.12, 0.0, L4]
+    goal_pos = [x_offset + 0.14, y_offset + 0.0, L4]
 
     angles = ik_dh_v2(*goal_pos)
     print("IK 결과 (rad):", angles)

@@ -125,7 +125,7 @@ def rad_to_xm(val):
 
 # === 메인 ===
 if __name__=="__main__":
-    goal_pos = [0.15, 0.0, d1+L4]
+    goal_pos = [0.1, 0.0, d1+L4]
 
     angles = ik_dh_v2(*goal_pos)
     print("IK 결과 (rad):", angles)

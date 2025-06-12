@@ -59,9 +59,14 @@ robot_chain = Chain(name="4dof_arm", links=[
     DHLink(alpha=0,            a=L3,  d=0,  theta=0, bounds=(0, np.radians(90))),
 ])
 
-def ik_dh_v2(x, y, z):
+def ik_dh_v2(x, y, z, init_angle=None):
     target_position = np.array([x, y, z])
-    init = [0.0, 0.0, -np.radians(45)]
+    
+    if init_angle is None:
+        init = [0, 0, 0]
+    else:
+        init = init_angle
+        
     full_solution = robot_chain.inverse_kinematics(
         target_position=target_position,
         orientation_mode=None,
@@ -133,10 +138,13 @@ def follow_path(points, delay):
     actual_points.append(tuple(ee_pos))
     print(f"000: Target = {points[0]}, EE = {tuple(np.round(ee_pos, 4))}")
 
+    prev_angle = [0.0, 0.0, 0.0]  # 초기 각도 설정
+    
     # 나머지 점 순회
     for i, pt in enumerate(points[1:], start=1):
         try:
-            angles = ik_dh_v2(*pt)
+            angles = ik_dh_v2(*pt, init_angle=prev_angle[:3])
+            prev_angle = angles
             for j, ang in enumerate(angles):
                 dxl_id = [0, 1, 2, 3][j]
                 if dxl_id in AX_IDS:
@@ -175,7 +183,7 @@ def visualize_trajectory(points, show_labels=False):
     ax.legend()
     plt.show()
 
-# === 메인 ===
+# === 메인 === 9~22까지 그리기
 if __name__ == "__main__":
     center_point = (x_offset+0.16, y_offset+0.0, L4)  # 중심점
     radius = 0.06
