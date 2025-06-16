@@ -47,7 +47,7 @@ for dxl_id in XM_IDS:
 d1 = 0.0961
 L2 = 0.12 
 L3 = 0.12
-L4 = 0.086
+L4 = 0.083
 
 x_offset = 0.006
 y_offset = 0.005
@@ -108,7 +108,7 @@ def rad_to_xm(val):
     return int(np.clip(2048 - deg*4096/360, 0, 4095))
 
 # === 원 경로 생성 ===
-def generate_circle_path(center, radius, num_points=200, extra_points=4):
+def generate_circle_path(center, radius, num_points=300, extra_points=4):
     cx, cy, cz = center
     total_points = num_points + extra_points
     angles = np.linspace(0, 2*np.pi*(1 + extra_points/num_points), total_points)
@@ -123,7 +123,7 @@ def follow_path(points, delay):
         return actual_points
 
     # 첫 점으로 이동
-    first_angles = ik_dh_v2(points[0][0],points[0][1], points[0][2])
+    first_angles = ik_dh_v2(points[0][0],points[0][1], points[0][2]+0.01)
     for j, ang in enumerate(first_angles):
         dxl_id = [0, 1, 2, 3][j]
         if dxl_id in AX_IDS:
@@ -185,8 +185,8 @@ def visualize_trajectory(points, show_labels=False):
 
 # === 메인 === (x값 0.13에서 가장잘됨 여기로 최대한 맞추기)
 if __name__ == "__main__":
-    center_point = (x_offset+0.16, y_offset-0.04, L4)  # 중심점
-    radius = 0.05
+    center_point = (x_offset+0.12, y_offset-0.0, L4)  # 중심점
+    radius = 0.02
     path = generate_circle_path(center_point, radius)
-    followed = follow_path(path, delay=0.05)
+    followed = follow_path(path, delay=0.1)
     visualize_trajectory(followed, show_labels=True)
